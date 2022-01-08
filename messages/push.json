@@ -1,0 +1,12 @@
+{
+  "commandDescription": "push all manual step yml files to the target org",
+  "typeFlagDescription": "type of deployment steps to be applied.",
+  "sourceDirFlagDescription": "path to yml files to be applied",
+  "fileFlagDescription": "yml file to be applied to org",
+  "errorNoOrgResults": "No results found for the org '%s'.",
+  "examples": [
+    "sfdx con242:deployment-steps:apply --targetusername myOrg@example.com -f sfdx-12345.yml",
+    "sfdx con242:deployment-steps:apply --targetusername myOrg@example.com -d ./deployment-steps",
+    "sfdx con242:deployment-steps:apply --targetusername myOrg@example.com -d ./deployment-steps --type=predeployment"
+  ]
+}

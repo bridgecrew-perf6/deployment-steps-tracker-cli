@@ -1,0 +1,40 @@
+reference: PREFIX-12346
+author: test@mail.com
+release: 29.0.2
+steps:
+  1:
+    title: Enable Omnichannel Settings
+    description: Enable Omni Channel Settings in Setup Menu
+    type: pre-deployment
+    resetAfterSandboxRefresh: false
+    resetOnInstallOfPackage:
+      - core
+      - vera-tool
+    contentType: richtext
+    content: >
+      - Go to Setup > Service > Omnichannel  - Click on Edit and enable the
+      Setting \"Omni Channel\" - Then, click save and validate setting has been \n
+  2:
+    title: Enable Omnichannel Settings
+    description: Enable Omni Channel Settings in Setup Menu
+    type: pre-deployment
+    resetAfterSandboxRefresh: false
+    resetOnInstallOfPackage:
+      - core
+      - vera-tool
+    contentType: richtext
+    content: >
+      Go to Setup > Service > Omnichannel  - Click on Edit and enable the
+      Setting \"Omni Channel\" - Then, click save and validate setting has been
+  3:
+    title: Enable Omnichannel Settings
+    description: Enable Omni Channel Settings in Setup Menu
+    type: pre-deployment
+    resetAfterSandboxRefresh: false
+    resetOnInstallOfPackage:
+      - core
+      - vera-tool
+    contentType: richtext
+    content: >
+      Go to Setup > Service > Omnichannel  - Click on Edit and enable the
+      Setting \"Omni Channel\" - Then, click save and validate setting has been \n"

@@ -9,7 +9,8 @@ import { flags, SfdxCommand } from '@salesforce/command';
 import { Messages, SfdxError } from '@salesforce/core';
 import { AnyJson } from '@salesforce/ts-types';
 import parseFiles from '../../../util/deployment-steps/parse-files';
-import { ParsedStep } from '../../../interfaces/deployment-step';
+import { DeploymentFromOrg, DeploymentResponse, ParsedStep } from '../../../interfaces/deployment-step';
+import queryDeploymentFromOrg from '../../../util/deployment-steps/query-deployment-steps';
 
 // Initialize Messages with the current plugin directory
 Messages.importMessagesDirectory(__dirname);
@@ -22,6 +23,7 @@ export default class Push extends SfdxCommand {
   public static description = messages.getMessage('commandDescription');
   public static examples = messages.getMessage('examples').split(os.EOL);
 
+  // define command flags
   protected static flagsConfig = {
     sourcedir: flags.string({
       char: 'd',
@@ -39,45 +41,32 @@ export default class Push extends SfdxCommand {
     const dir = (this.flags.sourcedir || '') as string;
     const type = (this.flags.type || '') as string;
 
-    // this.org is guaranteed because requiresUsername=true, as opposed to supportsUsername
     const conn = this.org.getConnection();
-    const query = 'Select Name, TrialExpirationDate from Organization';
-    // The type we are querying for
-    interface Organization {
-      Name: string;
-      TrialExpirationDate: string;
-    }
 
-    // Query the org
-    const result = await conn.query<Organization>(query);
-
-    if (!result.records || result.records.length <= 0) {
-      throw new SfdxError(messages.getMessage('errorNoOrgResults', [this.org.getOrgId()]));
-    }
-
+    // get deployment steps from files
     let deploymentSteps: ParsedStep[] = await parseFiles(dir);
 
     // filter by type flag
     if (type !== '') {
       deploymentSteps = deploymentSteps.filter((step) => type.split(',').includes(step.type));
     }
-
-    // eslint-disable-next-line no-console
-    console.log(deploymentSteps);
-
-    this.ux.log('hi there, command is awesome!');
-
-    // this.hubOrg is NOT guaranteed because supportsHubOrgUsername=true, as opposed to requiresHubOrgUsername.
-    if (this.hubOrg) {
-      const hubOrgId = this.hubOrg.getOrgId();
-      this.ux.log(`My hub org id is: ${hubOrgId}`);
+    // get relevant deployment steps from org
+    let queryResults: DeploymentFromOrg[] = [];
+    if (deploymentSteps) {
+      queryResults = await queryDeploymentFromOrg(deploymentSteps, conn);
     }
+    // calculate difference to push to org
+    let stepsToInsert: ParsedStep[] = [];
+    deploymentSteps.forEach((step) => {
+      if (!queryResults.some((queryItem) => queryItem.Name === step.reference)) {
+        stepsToInsert = [...stepsToInsert, step];
+      }
+    });
+    // eslint-disable-next-line no-console
+    console.log('updating following data...');
+    // eslint-disable-next-line no-console
+    console.table(stepsToInsert, ['reference', 'title', 'type']);
 
-    /* if (this.flags.force && this.args.file) {
-      this.ux.log(`You input --force and a file: ${this.args.file as string}`);
-    }*/
-
-    // Return an object to be displayed with --json
     return { orgId: this.org.getOrgId() };
   }
 }

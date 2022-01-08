@@ -27,3 +27,13 @@ export interface ParsedStep {
   contentType?: string;
   content?: string;
 }
+export interface DeploymentFromOrg {
+  Id?: string;
+  Name?: string;
+  Execution_required__c?: boolean;
+}
+export interface DeploymentResponse {
+  done?: boolean;
+  records?: DeploymentFromOrg[];
+  totalSize?: number;
+}
